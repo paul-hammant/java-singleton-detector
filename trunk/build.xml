@@ -1,1 +1,29 @@
-Ant build file here
+<project default="jar">
+	
+	<target name="clean">
+		<delete dir="target"/>
+	</target>
+	
+	<target name="compile">
+		<mkdir dir="target/classes"/>
+		<javac srcdir="src/java" destdir="target/classes"/>
+	</target>
+	
+	<target name="jar">
+		<mkdir dir="target/"/>
+		<jar destfile="target/google-singleton-detector.jar" basedir="target/classes">
+			<manifest>
+				<attribute name="Main-Class" value="com.google.singletondetector.Foo"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="test">	
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<formatter type="plain"/>
+			<test name="my.test.TestCase"/>
+		</junit>
+	</target>
+	
+		
+</project>

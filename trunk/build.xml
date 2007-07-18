@@ -1,29 +1,61 @@
-<project default="jar">
-	
+<project name="google-singleton-detector" default="zip">
+	<property name="version" value="0.7"/>
+		
 	<target name="clean">
 		<delete dir="target"/>
 	</target>
 	
-	<target name="compile">
+	<target name="compile" depends="clean">
 		<mkdir dir="target/classes"/>
-		<javac srcdir="src/java" destdir="target/classes"/>
+		<javac srcdir="src/java" destdir="target/classes" classpath="lib/asm-3.0.jar"/>
 	</target>
 	
-	<target name="jar">
-		<mkdir dir="target/"/>
-		<jar destfile="target/google-singleton-detector.jar" basedir="target/classes">
+	
+	<target name="compile-tests" depends="compile">
+		<mkdir dir="target/test-classes"/>
+		<javac srcdir="src/test" destdir="target/test-classes" classpath="target/classes;lib/asm-3.0.jar;lib/junit.jar"/>
+	</target>
+	
+	<target name="test" depends="compile-tests">
+		<mkdir dir="target/test-reports"/>
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement location="src/test"/>
+				<pathelement location="target/classes"/>
+				<pathelement location="target/test-classes"/>
+				<pathelement location="lib/asm-3.0.jar"/>
+				<pathelement location="lib/junit.jar"/>
+			</classpath>
+			
+			<formatter type="plain"/>
+			
+			<batchtest fork="yes" todir="target/test-reports">
+				<fileset dir="src/test">
+					<include name="**/*Test*.java"/>
+					<exclude name="**/AllTests.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<target name="jar" depends="test">
+		<jar destfile="target/gsd.jar" basedir="target/classes">
 			<manifest>
-				<attribute name="Main-Class" value="com.google.singletondetector.Foo"/>
+				<attribute name="Main-Class" value="com.google.singletondetector.Main"/>
+				<attribute name="Class-Path" value="asm-3.0.jar"/>
 			</manifest>
 		</jar>
 	</target>
 	
-	<target name="test">	
-		<junit printsummary="yes" fork="yes" haltonfailure="yes">
-			<formatter type="plain"/>
-			<test name="my.test.TestCase"/>
-		</junit>
-	</target>
-	
-		
+	<target name="zip" depends="jar">
+		<zip destfile="target/gsd-${version}.zip">
+			<fileset dir="lib">
+				<include name="*.jar"/>
+				<exclude name="junit.jar"/>
+			</fileset>
+			<fileset dir="target">
+				<include name="gsd.jar"/>
+			</fileset>
+        	</zip>
+	</target>	
 </project>

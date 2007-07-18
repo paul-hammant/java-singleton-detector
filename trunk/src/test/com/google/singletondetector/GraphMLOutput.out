@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:y="http://www.yworks.com/xml/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml http://www.yworks.com/xml/schema/graphml/1.0/ygraphml.xsd">
+<key id="d0" for="node" yfiles.type="nodegraphics"/>
+<key id="d1" for="edge" yfiles.type="edgegraphics"/>
+  <graph id="SingletonDetector" edgedefault="directed">
+    <node id="p1/HingletonOne">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Fill color = "#FF9900"/>
+          <y:NodeLabel textColor="#000000">HingletonOne&#xA;p1&#xA;(NotASingletonTwo)&#xA;(p2)</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="p2/SingletonOne">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Fill color = "#FF0000"/>
+          <y:NodeLabel textColor="#FFFFFF">SingletonOne&#xA;p2</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="p3/HingletonUserOne">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Fill color = "#CCFFFF"/>
+          <y:NodeLabel textColor="#000000">HingletonUserOne&#xA;p3</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="p2/SingletonUserOne">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Fill color = "#CCFFFF"/>
+          <y:NodeLabel textColor="#000000">SingletonUserOne&#xA;p2</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <edge source="p3/HingletonUserOne" target="p1/HingletonOne">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color = "#FF9900"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge source="p2/SingletonUserOne" target="p2/SingletonOne">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color = "#FF0000"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+  </graph>
+</graphml>

@@ -37,7 +37,7 @@ import com.google.singletondetector.classpath.JarClasspathRoot;
  */
 public class Main {
   // Version number
-  private static String VERSION = "0.7";
+  private static String VERSION = "0.7.0";
 
   public static void main(String[] args) throws IOException {
     List<String> pargs = new ArrayList<String>();

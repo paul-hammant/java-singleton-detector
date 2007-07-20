@@ -1,5 +1,5 @@
 <project name="google-singleton-detector" default="zip">
-	<property name="version" value="0.7"/>
+	<property name="version" value="0.7.0"/>
 		
 	<target name="clean">
 		<delete dir="target"/>
@@ -52,6 +52,10 @@
 			<fileset dir="lib">
 				<include name="*.jar"/>
 				<exclude name="junit.jar"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="README.txt"/>
+				<include name="LICENSE-2.0.txt"/>
 			</fileset>
 			<fileset dir="target">
 				<include name="gsd.jar"/>

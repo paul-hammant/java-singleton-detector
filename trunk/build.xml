@@ -1,5 +1,5 @@
 <project name="google-singleton-detector" default="zip">
-	<property name="version" value="0.7.0"/>
+	<property name="version" value="0.7.1"/>
 		
 	<target name="clean">
 		<delete dir="target"/>
@@ -39,20 +39,18 @@
 	</target>
 	
 	<target name="jar" depends="test">
-		<jar destfile="target/gsd.jar" basedir="target/classes">
+		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar.jar"/>
+		<jarjar jarfile="target/gsd.jar">
 			<manifest>
 				<attribute name="Main-Class" value="com.google.singletondetector.Main"/>
-				<attribute name="Class-Path" value="asm-3.0.jar"/>
 			</manifest>
-		</jar>
+			<fileset dir="target/classes"/>
+			<zipfileset src="lib/asm-3.0.jar"/>
+		</jarjar>
 	</target>
 	
 	<target name="zip" depends="jar">
 		<zip destfile="target/gsd-${version}.zip">
-			<fileset dir="lib">
-				<include name="*.jar"/>
-				<exclude name="junit.jar"/>
-			</fileset>
 			<fileset dir=".">
 				<include name="README.txt"/>
 				<include name="LICENSE-2.0.txt"/>

@@ -1,5 +1,5 @@
 
-Google Singleton Detector (0.7.0)
+Google Singleton Detector (0.7.1)
 ===============================
 
 Google Singleton Detector (GSD) is an Open Source tool which allows you to
@@ -21,7 +21,7 @@ and may be downloaded in the following distributions:
   jars.  Simply unzip the file and run GSD.jar.
 
   gsd-src-X.X.X.zip - A source only distribution which must be built using
-  ant.  Included precompiled external jars.
+  ant.  Includes precompiled external jars.
 
 
 Building GSD

@@ -1,5 +1,5 @@
 
-Google Singleton Detector (0.7.1)
+Google Singleton Detector (0.7.2)
 ===============================
 
 Google Singleton Detector (GSD) is an Open Source tool which allows you to

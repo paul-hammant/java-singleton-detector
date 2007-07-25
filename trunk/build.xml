@@ -1,5 +1,5 @@
 <project name="google-singleton-detector" default="zip">
-	<property name="version" value="0.7.1"/>
+	<property name="version" value="0.7.2"/>
 		
 	<target name="clean">
 		<delete dir="target"/>

@@ -107,19 +107,35 @@ public class SingletonDetector implements Opcodes {
 
     // Fifth pass: gather statistics
     if (flags.showBanner() || flags.showStats()) {
+      // Get stats on current class
       for (Clazz cl : classes.values()) {
         if (cl.isDrawn()) {
           stats.incClassesDrawn();
-        }
   
-        if (cl.isSingleton()) {
-          stats.incSingletons();
-        } else if (cl.isHingleton()) {
-          stats.incHingletons();
-        } else if (cl.isMingleton()) {
-          stats.incMingletons();
-        } else if (cl.isFingleton()) {
-          stats.incFingletons();
+          if (cl.isSingleton()) {
+            stats.incSingletons();
+          } else if (cl.isHingleton()) {
+            stats.incHingletons();
+          } else if (cl.isMingleton()) {
+            stats.incMingletons();
+          } else if (cl.isFingleton()) {
+            stats.incFingletons();
+          }
+          
+          // Get stats for all used classes
+          for (Clazz used : cl.getClassesIUse()) {
+            if (used.isDrawn()) {    
+              if (used.isSingleton()) {
+                stats.incSingletonUsers();
+              } else if (used.isHingleton()) {
+                stats.incHingletonUsers();
+              } else if (used.isMingleton()) {
+                stats.incMingletonUsers();
+              } else if (used.isFingleton()) {
+                stats.incFingletonUsers();
+              }
+            }
+          }
         }
       }
     }
@@ -219,13 +235,10 @@ public class SingletonDetector implements Opcodes {
           && (currClass.isSpecial() || !flags.ignoreOthers())) {
         if (returnType.equals(referencedClass) && cl.isSingleton()) {
           currClass.addClassIUse(cl);
-          stats.incSingletonUsers();
         } else if (cl.doIHingle(returnType) && cl.isHingleton()) {
           currClass.addClassIUse(cl);
-          stats.incHingletonUsers();
         } else if (params.equals("") && cl.isMingleton()) {
           currClass.addClassIUse(cl);
-          stats.incMingletonUsers();
         }
       }
     }
@@ -236,7 +249,6 @@ public class SingletonDetector implements Opcodes {
     Clazz cl = classes.get(removePrefix(owner));
     if (cl != null && cl != currClass && cl.isFingleton()) {
       currClass.addClassIUse(cl);
-      stats.incFingletonUsers();
     }
   }
 

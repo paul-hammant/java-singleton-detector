@@ -75,7 +75,6 @@ public class SingletonDetectorTest extends TestCase {
 
   public SingletonDetectorTest() throws MalformedURLException {
     URL url = new File("target/test-classes").toURI().toURL();
-    System.out.println(url);
     root = new DirectoryClasspathRoot(url);
   }
 

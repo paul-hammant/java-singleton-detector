@@ -15,15 +15,9 @@
  */
 package com.google.singletondetector;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Opcodes;
-
 import com.google.singletondetector.classpath.ClasspathRoot;
+import com.google.singletondetector.classpath.DirectoryClasspathRoot;
+import com.google.singletondetector.classpath.JarClasspathRoot;
 import com.google.singletondetector.output.FingletonOutputNode;
 import com.google.singletondetector.output.HingletonOutputNode;
 import com.google.singletondetector.output.MingletonOutputNode;
@@ -32,6 +26,19 @@ import com.google.singletondetector.output.OutputNode;
 import com.google.singletondetector.output.SingletonOutputNode;
 import com.google.singletondetector.visitors.SingletonClassVisitor;
 import com.google.singletondetector.visitors.SingletonUsageClassVisitor;
+
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The main SingletonDetector class, which generates the visitors for each class
@@ -56,36 +63,53 @@ public class SingletonDetector implements Opcodes {
   // Statistics kept on the SingletonDetector
   private Stats stats;
 
-  // The common classpath root for all classes
-  private ClasspathRoot classpath;
-
+  /**
+   * Test constructor, used to pass in a classpath and a list of class names
+   * directly, avoiding a directory or jar.  Uses default flags.
+   */
   public SingletonDetector(ClasspathRoot classpath, String prefix,
       String... classNames) {
     this(classpath, prefix, new Flags(), classNames);
   }
-
+  
+  /**
+   * Test constructor, used to pass in a classpath and a list of class names
+   * directly, avoiding a directory or jar.
+   */
   public SingletonDetector(ClasspathRoot classpath, String prefix, Flags flags,
       String... classNames) {
+    this(getClassReaders(classpath, classNames, prefix), prefix, flags);
+  }
+  
+  /**
+   * Default constructor, used to pass in a string which represents a directory
+   * or a jar.
+   */
+  public SingletonDetector(String dir, String prefix, Flags flags) throws MalformedURLException {
+    this(getClassReaders(dir, prefix, flags), prefix, flags); 
+  }
+
+  /**
+   * Master constructor, called by all other constructors.  Requires a list of
+   * ClassReaders, which is generated in the other constructors by different
+   * methods.
+   */
+  public SingletonDetector(List<ClassReader> crlist, String prefix, Flags flags) {
     stats = new Stats();
-    this.classpath = classpath;
     this.prefix = prefix;
     this.flags = flags;
-    ArrayList<ClassReader> crlist = new ArrayList<ClassReader>();
+    
+    // Verbose: Begin processing
+    if (flags.isVerbose()) {
+      System.out.print("Processing... ");
+    }
 
-    // First pass: determine the type of each class (i.e. Singleton)
-    for (String className : classNames) {
-      ClassReader cr;
-      try {
-        cr = getClassReader(className);
-        if (!cr.getSuperName().equals("java/lang/Enum")) {
-          crlist.add(cr);
-          cr.accept(new SingletonClassVisitor(this), ClassReader.SKIP_DEBUG);
-          stats.incClassesRead();
-        }
-      } catch (Throwable e) {
-        e.printStackTrace();
-        System.out.println("Failed to read " + className);
-      }
+    // First pass: determine the type of each class (i.e. Singleton), count the
+    //             number of read classes and remove enums
+    Iterator<ClassReader> iter = crlist.iterator();
+    for (ClassReader cr : crlist) {
+      cr.accept(new SingletonClassVisitor(this), ClassReader.SKIP_DEBUG);
+      stats.incClassesRead();
     }
 
     // Second pass: determine which special classes each class uses
@@ -139,13 +163,11 @@ public class SingletonDetector implements Opcodes {
         }
       }
     }
-  }
-
-  public ClassReader getClassReader(String className)
-      throws IOException {
-    String resourceName = className.replace('.', '/') + ".class";
-    ClassReader cr = new ClassReader(classpath.getResourceAsStream(resourceName));
-    return cr;
+    
+    // Verbose: end processing
+    if (flags.isVerbose()) {
+      System.out.println("done.");
+    }
   }
 
   public void setCurrClass(String name) {
@@ -189,6 +211,96 @@ public class SingletonDetector implements Opcodes {
       ret = ret.substring(prefix.length());
     }
     return ret;
+  }
+  
+  /*************************************************************************/
+  /*                         CLASS READER METHODS                          */
+  /*************************************************************************/
+  
+  private static ClassReader getClassReader(ClasspathRoot classpath,
+      String className) throws IOException {
+    String resourceName = className;
+    if (!resourceName.endsWith(".class")) {
+      resourceName += ".class";
+    }
+    ClassReader cr =
+        new ClassReader(classpath.getResourceAsStream(resourceName));
+    return cr;
+  }
+
+  private static boolean validcr(ClassReader cr, String prefix) {
+    return !cr.getSuperName().equals("java/lang/Enum")
+        && cr.getClassName().startsWith(prefix);
+  }
+
+  private static List<ClassReader> getClassReaders(ClasspathRoot classpath,
+      String[] classNames, String prefix) {
+    List<ClassReader> crlist = new ArrayList<ClassReader>();
+    for (String className : classNames) {
+      ClassReader cr;
+      try {
+        cr = getClassReader(classpath, className);
+        if (validcr(cr, prefix)) {
+          crlist.add(cr);
+        }
+      } catch (IOException e) {
+        System.out.println("Failed to read " + className);
+      }
+    }
+    return crlist;
+  }
+  
+  private static List<ClassReader> getClassReaders(String dir, String prefix,
+      Flags flags) throws MalformedURLException {
+    List<ClassReader> crlist = new ArrayList<ClassReader>();
+
+    // Get the classpath for the classes directory or jar
+    URL root = new File(dir).toURI().toURL();
+    ClasspathRoot classpath;
+    if (dir.endsWith(".jar")) {
+      classpath = new JarClasspathRoot(root);
+    } else {
+      classpath = new DirectoryClasspathRoot(root);
+    }
+
+    // Get the class readers for each class
+    buildCrlist(root, classpath, prefix, "", crlist, flags.isVerbose());
+    
+    return crlist;
+  }
+  
+  private static void buildCrlist(URL root, ClasspathRoot classpath,
+      String prefix, String packageName, List<ClassReader> crlist,
+      boolean verbose) throws MalformedURLException {
+    for (String resource : classpath.getResources(packageName)) {
+      if (resource.endsWith(".class")) {
+        String className = packageName + resource;
+        //className = className.replace(".class", "").replace('/', '.');
+        if (!className.contains("$")) {
+          ClassReader cr;
+          try {
+            cr = getClassReader(classpath, className);
+            if (validcr(cr, prefix)) {
+              if (verbose) {
+                System.out.println("Found: "
+                    + cr.getClassName().replace("/", "."));
+              }
+              crlist.add(cr);
+            }
+          } catch (IOException e) {
+            System.out.println("Failed to read " + className);
+          }
+        }
+      } else if (resource.endsWith(".jar")) {
+        String temp = root.getPath() + packageName + resource;
+        URL jarRoot = new File(temp).toURI().toURL();
+        ClasspathRoot jarPath = new JarClasspathRoot(jarRoot);
+        buildCrlist(jarRoot, jarPath, prefix, "", crlist, verbose);
+      } else {
+        buildCrlist(root, classpath, prefix, packageName + resource + "/", crlist,
+            verbose);
+      }
+    }
   }
 
   /*************************************************************************/
@@ -264,7 +376,12 @@ public class SingletonDetector implements Opcodes {
     HashMap<String, OutputNode> nodes = getOutputNodes();
     String nodeOutput = "";
     String edgeOutput = "";
-
+    
+    // Verbose: begin output
+    if (flags.isVerbose()) {
+      System.out.print("Generating output graph... ");
+    }
+    
     // Fill buffers
     for (OutputNode node : nodes.values()) {
       nodeOutput += node.getGraphMlNode();
@@ -283,6 +400,11 @@ public class SingletonDetector implements Opcodes {
               + "          <y:Shape type=\"rectangle\"/>\n"
               + "        </y:ShapeNode>\n" + "      </data>\n"
               + "    </node>\n";
+    }
+    
+    // Verbose: end output
+    if (flags.isVerbose()) {
+      System.out.println("done.");
     }
 
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"

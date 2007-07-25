@@ -16,18 +16,10 @@
 package com.google.singletondetector;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import com.google.singletondetector.classpath.ClasspathRoot;
-import com.google.singletondetector.classpath.DirectoryClasspathRoot;
-import com.google.singletondetector.classpath.JarClasspathRoot;
 
 /**
  * Reads through all of the classes in a given directory or jar and runs them
@@ -37,7 +29,7 @@ import com.google.singletondetector.classpath.JarClasspathRoot;
  */
 public class Main {
   // Version number
-  private static String VERSION = "0.7.2";
+  private static String VERSION = "0.7.3";
 
   public static void main(String[] args) throws IOException {
     List<String> pargs = new ArrayList<String>();
@@ -152,67 +144,20 @@ public class Main {
 
   public Main(String dir, String outfile, String prefix, Flags flags)
       throws IOException {
-    // Get the classpath for the classes directory or jar
-    URL root = new File(dir).toURI().toURL();
-    ClasspathRoot classpath;
-    if (dir.endsWith(".jar")) {
-      classpath = new JarClasspathRoot(root);
-    } else {
-      classpath = new DirectoryClasspathRoot(root);
-    }
-
-    // Get the names of each class
-    Set<String> classes = new HashSet<String>();
-    analyzePackage(classpath, prefix, classes, flags.isVerbose());
-
-    // Verbose: Begin processing
-    if (flags.isVerbose()) {
-      System.out.print("Processing... ");
-    }
 
     // Create the singleton detector
     SingletonDetector detector =
-        new SingletonDetector(classpath, prefix, flags, classes
-            .toArray(new String[classes.size()]));
-
-    // Verbose: end processing, begin output
-    if (flags.isVerbose()) {
-      System.out.print("done.\nGenerating output graph... ");
-    }
+        new SingletonDetector(dir, prefix, flags);
 
     // Get output and write to the specified file
     BufferedWriter out = new BufferedWriter(new FileWriter(outfile));
     out.write(detector.getGraphMlOutput());
     out.close();
 
-    // Verbose: end output
-    if (flags.isVerbose()) {
-      System.out.println("done.");
-    }
-
     // Show statistics if necessary
     if (flags.showStats()) {
       System.out.println();
       System.out.println(detector.getOutput(true));
-    }
-  }
-
-  private void analyzePackage(ClasspathRoot classpath, String packageName,
-      Set<String> classes, boolean verbose) throws IOException {
-    for (String resource : classpath.getResources(packageName)) {
-      if (resource.endsWith(".class")) {
-        String className = packageName + resource;
-        className = className.replace(".class", "").replace('/', '.');
-        if (!className.contains("$") && !className.equals("java.lang.Enum")) {
-          if (verbose) {
-            System.out.println("Found: " + className);
-          }
-          classes.add(className);
-        }
-      } else {
-        analyzePackage(classpath, packageName + resource + "/", classes,
-            verbose);
-      }
     }
   }
 }

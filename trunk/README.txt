@@ -1,5 +1,5 @@
 
-Google Singleton Detector (0.7.2)
+Google Singleton Detector (0.7.3)
 ===============================
 
 Google Singleton Detector (GSD) is an Open Source tool which allows you to
@@ -27,11 +27,15 @@ and may be downloaded in the following distributions:
 Building GSD
 ============
 
-Building GSD is currently handled through ant (version 1.7), availabel at:
+Building GSD currently requires ant 1.7, available at:
 
   http://ant.apache.org/
 
-To build the project, enter 'ant' into the directory you unzipped the soruce
+and Java 1.5, available at:
+  
+  http://java.sun.com/javase/downloads/index.jsp
+
+To build the project, enter 'ant' into the directory you unzipped the source
 to.  This will create the directory 'target' with a gsd-X.X.X.zip file inside.
 Other ant commands:
 
@@ -45,6 +49,10 @@ Other ant commands:
 
 Usage
 =====
+
+Running GSD currently requires Java 1.5, available at:
+
+  http://java.sun.com/javase/downloads/index.jsp
 
 Unzip gsd-X.X.X.zip and run with the following command:
 
@@ -144,7 +152,8 @@ non-primitive global state of another class.
 Additional Information
 ======================
 
-If you need any more information about GSD, or want to submit a bug or contribute in any way, check out the Google Code page at 
+If you need any more information about GSD, or want to submit a bug or
+contribute in any way, check out the Google Code page at:
 
   http://code.google.com/p/google-singleton-detector/
 

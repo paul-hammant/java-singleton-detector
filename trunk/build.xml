@@ -1,5 +1,5 @@
 <project name="google-singleton-detector" default="zip">
-	<property name="version" value="0.7.3"/>
+	<property name="version" value="0.7.4"/>
 		
 	<target name="clean">
 		<delete dir="target"/>
@@ -46,6 +46,7 @@
 			</manifest>
 			<fileset dir="target/classes"/>
 			<zipfileset src="lib/asm-3.0.jar"/>
+			<rule pattern="org.objectweb.asm.**" result="com.google.singletondetector.asm.@1"/>
 		</jarjar>
 	</target>
 	

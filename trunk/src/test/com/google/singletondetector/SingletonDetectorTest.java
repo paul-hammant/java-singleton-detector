@@ -53,6 +53,14 @@ public class SingletonDetectorTest extends TestCase {
 
   // The common classpath for all test classes
   private ClasspathRoot root;
+  
+  /**
+   * Default constructor, sets classpath root
+   */
+  public SingletonDetectorTest() throws MalformedURLException {
+    URL url = new File("target/test-classes").toURI().toURL();
+    root = new DirectoryClasspathRoot(url);
+  }
 
   /*************************************************************************/
   /*                           UTILITY METHODS                             */
@@ -71,11 +79,6 @@ public class SingletonDetectorTest extends TestCase {
     }
     is.close();
     return buf.toString();
-  }
-
-  public SingletonDetectorTest() throws MalformedURLException {
-    URL url = new File("target/test-classes").toURI().toURL();
-    root = new DirectoryClasspathRoot(url);
   }
 
   /*************************************************************************/

@@ -39,13 +39,14 @@ To build the project, enter 'ant' into the directory you unzipped the source
 to.  This will create the directory 'target' with a gsd-X.X.X.zip file inside.
 Other ant commands:
 
+```
   ant clean         - Remove generate files
   ant compile       - Build source
   ant compile-tests - Build tests
   ant test          - Build and run tests
   ant jar           - Build the distributable jar
   ant zip           - Build the distributable zip
-
+```
 
 Usage
 =====
@@ -53,9 +54,10 @@ Usage
 Running GSD currently requires Java 1.5, available at:
 
   http://java.sun.com/javase/downloads/index.jsp
-
+  
 Unzip gsd-X.X.X.zip and run with the following command:
 
+```
   java -jar sd.jar [-(VvshmfoSb)] [-t <threshold>] <classes dir/jar> <output file> [<package>]
    -V       - Print version and exit
    -v       - Enable verbose mode
@@ -67,6 +69,7 @@ Unzip gsd-X.X.X.zip and run with the following command:
    -S       - Print statistics upon completion
    -b       - Add stats banner to the graph
    -t <val> - Threshold (minimum edges required to draw a node)
+```
 
 The most important options here are probably s, h, m and f, which when included
 prevent the program from finding certain types of _ingletons.
@@ -108,33 +111,14 @@ to work with.
 
 There are six different types of nodes:
 
-+---------+---------+---------------------------------------------------------+
 |  Color  |  Class  |                     Description                         |
-+---------+---------+---------------------------------------------------------+
-|         |         |A class for which there should only be one instance in   |
-|         |         |the entire system at any given time. This program detects|
-|   Red   |Singleton|singletons which enforce their own singularity, which    |
-|         |         |means they keep one static instance of themselves and    |
-|         |         |pass it around through a static getter method.           |
-+---------+---------+---------------------------------------------------------+
-|         |         |Derived from "helper singleton," a class which turns     |
-| Orange  |Hingleton|another class into a singleton by enforcing that class's |
-|         |         |singularity.                                             |
-+---------+---------+---------------------------------------------------------+
-|         |         |Derived from "method singleton" a class which has any    |
-| Yellow  |Mingleton|static method that returns some state without taking any |
-|         |         |parameters.                                              |
-+---------+---------+---------------------------------------------------------+
-|  Green  |Fingleton|Derived from "field singleton," a class which contains a |
-|         |         |public static field.                         |
-+---------+---------+---------------------------------------------------------+
-| Lt Blue |  Other  |Any class which is directly dependent on a _ingleton.   |
-| (Oval)  |         |                                                         |
-+---------+---------+---------------------------------------------------------+
-|         |         |Displays statistics about the current codebase.  Is only |
-|  Blue   |    -    |drawn if the banner option (-b) is passed as a command   |
-|         |         |line argument.
-+---------+---------+---------------------------------------------------------+
+|---------|---------|---------------------------------------------------------|
+|  Red    | Singleton | A class for which there should only be one instance in the entire system at any given time. This program detects singletons which enforce their own singularity, which means they keep one static instance of themselves and pass it around through a static getter method. |
+| Orange |  Hingleton | Derived from "helper singleton," a class which turns another class into a singleton by enforcing that class's singularity. |
+|  Yellow  | Mingleton | Derived from "method singleton" a class which has any static method that returns some state without taking any parameters. |
+|  Green  | Fingleton | Derived from "field singleton," a class which contains a public static field. |
+| Light Blue |  Other  | Any class which is directly dependent on a *ingleton. |
+|  Blue | -  | Displays statistics about the current codebase.  Is only drawn if the banner option (-b) is passed as a command line argument |
 
 Each node contains two lines of text; the first line is the name of the class
 that the node represents, and the second line is the package that class is in

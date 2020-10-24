@@ -15,6 +15,7 @@
  */
 package com.google.singletondetector.visitors;
 
+
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Label;
@@ -27,7 +28,12 @@ import org.objectweb.asm.MethodVisitor;
  * 
  * @author David Rubel
  */
-public class NoopMethodVisitor implements MethodVisitor {
+public class NoopMethodVisitor extends MethodVisitor {
+
+  public NoopMethodVisitor() {
+		super(ASMVersion.getVersion());
+	}
+
 
   public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
     return null;
